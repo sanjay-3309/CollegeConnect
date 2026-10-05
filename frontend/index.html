@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        CollegeConnect | TNEA College Prediction Assistant
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/assets/styles.css"
+    >
+
+    <style>
+
+        /* =========================================================
+           ADDITIONAL COLLEGECONNECT FRONTEND STYLES
+        ========================================================= */
+
+        .hidden {
+            display: none !important;
+        }
+
+
+        /* =========================================================
+           SEARCHABLE MULTI SELECT
+        ========================================================= */
+
+        .picker {
+            width: 100%;
+        }
+
+        .picker-search-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .picker-search {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .picker-search-btn {
+            border: 1px solid rgba(99, 102, 241, 0.35);
+            background: rgba(99, 102, 241, 0.10);
+            color: #c7d2fe;
+            border-radius: 10px;
+            padding: 0 14px;
+            min-height: 42px;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        .picker-search-btn:hover {
+            background: rgba(99, 102, 241, 0.20);
+        }
+
+
+        .selected-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+            min-height: 10px;
+        }
+
+        .selected-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 999px;
+            padding: 7px 11px;
+            background: rgba(99, 102, 241, 0.13);
+            border: 1px solid rgba(99, 102, 241, 0.28);
+            color: #e0e7ff;
+            font-size: 0.75rem;
+            font-weight: 800;
+            max-width: 100%;
+        }
+
+        .selected-chip span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .selected-chip button {
+            border: 0;
+            background: transparent;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .selected-chip button:hover {
+            color: #ffffff;
+        }
+
+
+        .picker-box {
+            border: 1px solid rgba(148, 163, 184, 0.13);
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.45);
+            overflow: hidden;
+        }
+
+        .picker-options {
+            max-height: 235px;
+            overflow-y: auto;
+        }
+
+        .picker-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 13px;
+            color: #cbd5e1;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+            font-size: 0.8rem;
+        }
+
+        .picker-option:last-child {
+            border-bottom: 0;
+        }
+
+        .picker-option:hover {
+            background: rgba(99, 102, 241, 0.08);
+        }
+
+        .picker-option.selected {
+            background: rgba(99, 102, 241, 0.13);
+            color: #ffffff;
+        }
+
+        .picker-check {
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            border: 1px solid #64748b;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 18px;
+        }
+
+        .picker-check::after {
+            content: "✓";
+            opacity: 0;
+            font-size: 0.72rem;
+            font-weight: 900;
+        }
+
+        .picker-option.selected .picker-check {
+            background: #6366f1;
+            border-color: #818cf8;
+            color: #ffffff;
+        }
+
+        .picker-option.selected .picker-check::after {
+            opacity: 1;
+        }
+
+        .picker-empty {
+            padding: 18px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.78rem;
+        }
+
+        .picker-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 11px;
+            border-top: 1px solid rgba(148, 163, 184, 0.07);
+        }
+
+        .picker-count {
+            color: #64748b;
+            font-size: 0.71rem;
+        }
+
+        .picker-clear {
+            border: 0;
+            background: transparent;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 0.72rem;
+        }
+
+
+        /* =========================================================
+           SINGLE COLLEGE SEARCH
+        ========================================================= */
+
+        .college-search-box {
+            position: relative;
+        }
+
+        .college-suggestions {
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 8px;
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .college-suggestion {
+            padding: 11px 13px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+        }
+
+        .college-suggestion:last-child {
+            border-bottom: 0;
+        }
+
+        .college-suggestion:hover,
+        .college-suggestion.selected {
+            background: rgba(99, 102, 241, 0.11);
+        }
+
+        .college-suggestion-name {
+            color: #f8fafc;
+            font-size: 0.78rem;
+            font-weight: 800;
+            line-height: 1.4;
+        }
+
+        .college-suggestion-meta {
+            margin-top: 3px;
+            color: #64748b;
+            font-size: 0.69rem;
+        }
+
+        .college-selected-display {
+            margin-top: 8px;
+            padding: 9px 11px;
+            border-radius: 10px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.20);
+            color: #c7d2fe;
+            font-size: 0.74rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .college-selected-display button {
+            border: 0;
+            background: transparent;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+
+        /* =========================================================
+           RESULT FILTERS
+        ========================================================= */
+
+        .result-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 18px 0;
+        }
+
+        .result-filter-btn {
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            background: rgba(148, 163, 184, 0.05);
+            color: #94a3b8;
+            border-radius: 999px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 0.74rem;
+            font-weight: 800;
+        }
+
+        .result-filter-btn:hover {
+            background: rgba(99, 102, 241, 0.10);
+            color: #c7d2fe;
+        }
+
+        .result-filter-btn.active {
+            background: rgba(99, 102, 241, 0.16);
+            border-color: rgba(99, 102, 241, 0.35);
+            color: #e0e7ff;
+        }
+
+
+        .result-distribution {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .distribution-pill {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.69rem;
+            font-weight: 800;
+        }
+
+        .distribution-safe {
+            background: rgba(16, 185, 129, 0.10);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.20);
+        }
+
+        .distribution-target {
+            background: rgba(245, 158, 11, 0.10);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.20);
+        }
+
+        .distribution-reach {
+            background: rgba(239, 68, 68, 0.10);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.20);
+        }
+
+
+        /* =========================================================
+           RESULT CARDS
+        ========================================================= */
+
+        .result-list {
+            display: grid;
+            gap: 13px;
+        }
+
+        .result-card {
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            border-radius: 16px;
+            padding: 17px;
+            background: rgba(9, 13, 22, 0.52);
+        }
+
+        .result-card:hover {
+            border-color: rgba(99, 102, 241, 0.22);
+        }
+
+        .result-card-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .result-college-name {
+            color: #f8fafc;
+            font-size: 0.92rem;
+            line-height: 1.4;
+            font-weight: 900;
+        }
+
+        .result-branch {
+            color: #a5b4fc;
+            font-size: 0.78rem;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .result-location {
+            color: #64748b;
+            font-size: 0.71rem;
+            margin-top: 4px;
+        }
+
+        .result-probability-block {
+            text-align: right;
+            min-width: 100px;
+        }
+
+        .result-probability {
+            font-size: 1.45rem;
+            line-height: 1;
+            font-weight: 900;
+        }
+
+        .result-probability.safe {
+            color: #10b981;
+        }
+
+        .result-probability.target {
+            color: #f59e0b;
+        }
+
+        .result-probability.reach {
+            color: #ef4444;
+        }
+
+        .tier-badge {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 7px;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 0.65rem;
+            font-weight: 900;
+        }
+
+        .tier-safe {
+            background: rgba(16, 185, 129, 0.11);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.22);
+        }
+
+        .tier-target {
+            background: rgba(245, 158, 11, 0.11);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.22);
+        }
+
+        .tier-reach {
+            background: rgba(239, 68, 68, 0.11);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.22);
+        }
+
+
+        .result-stats {
+            display: grid;
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .result-stat {
+            padding: 9px;
+            border-radius: 9px;
+            background: rgba(148, 163, 184, 0.04);
+        }
+
+        .result-stat-label {
+            display: block;
+            color: #64748b;
+            font-size: 0.64rem;
+            margin-bottom: 3px;
+        }
+
+        .result-stat-value {
+            color: #dbeafe;
+            font-size: 0.76rem;
+            font-weight: 800;
+        }
+
+
+        .result-reasoning {
+            margin-top: 13px;
+            padding-top: 13px;
+            border-top: 1px solid rgba(148, 163, 184, 0.08);
+        }
+
+        .result-reasoning summary {
+            color: #cbd5e1;
+            cursor: pointer;
+            font-size: 0.74rem;
+            font-weight: 800;
+        }
+
+        .result-reasoning-text {
+            color: #94a3b8;
+            font-size: 0.74rem;
+            line-height: 1.55;
+            margin-top: 8px;
+        }
+
+
+        .result-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 13px;
+        }
+
+        .add-choice-btn {
+            border: 1px solid rgba(99, 102, 241, 0.35);
+            background: rgba(99, 102, 241, 0.11);
+            color: #c7d2fe;
+            border-radius: 9px;
+            padding: 9px 13px;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        .add-choice-btn:hover {
+            background: rgba(99, 102, 241, 0.20);
+        }
+
+        .add-choice-btn:disabled {
+            opacity: 0.55;
+            cursor: default;
+        }
+
+
+        /* =========================================================
+           NO RESULTS
+        ========================================================= */
+
+        .no-results {
+            padding: 35px 20px;
+            text-align: center;
+            border: 1px dashed rgba(148, 163, 184, 0.14);
+            border-radius: 15px;
+            color: #64748b;
+        }
+
+
+        /* =========================================================
+           CHOICE OPTIMIZER
+        ========================================================= */
+
+        .choice-card {
+            display: grid;
+            grid-template-columns: 42px minmax(0, 1fr) auto auto;
+            gap: 13px;
+            align-items: center;
+            padding: 14px;
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            border-radius: 14px;
+            background: rgba(9, 13, 22, 0.45);
+            margin-bottom: 10px;
+        }
+
+        .choice-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(99, 102, 241, 0.12);
+            color: #c7d2fe;
+            font-weight: 900;
+        }
+
+        .choice-college {
+            color: #f8fafc;
+            font-weight: 900;
+            font-size: 0.82rem;
+        }
+
+        .choice-branch {
+            margin-top: 3px;
+            color: #a5b4fc;
+            font-size: 0.73rem;
+        }
+
+        .choice-meta {
+            margin-top: 3px;
+            color: #64748b;
+            font-size: 0.68rem;
+        }
+
+        .choice-probability {
+            margin-top: 5px;
+            color: #94a3b8;
+            font-size: 0.68rem;
+        }
+
+        .choice-stats {
+            color: #94a3b8;
+            font-size: 0.68rem;
+            text-align: right;
+        }
+
+        .remove-choice-btn {
+            border: 1px solid rgba(239, 68, 68, 0.20);
+            background: rgba(239, 68, 68, 0.06);
+            color: #ef4444;
+            border-radius: 8px;
+            padding: 7px 10px;
+            cursor: pointer;
+        }
+
+
+        /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+        @media (max-width: 850px) {
+
+            .result-stats {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+            .choice-card {
+                grid-template-columns:
+                    38px minmax(0, 1fr);
+
+            }
+
+            .choice-stats,
+            .remove-choice-btn {
+                grid-column: 2;
+                text-align: left;
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .picker-search-row {
+                flex-direction: column;
+            }
+
+            .picker-search-btn {
+                width: 100%;
+            }
+
+            .result-card-header {
+                flex-direction: column;
+            }
+
+            .result-probability-block {
+                text-align: left;
+            }
+
+            .result-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================================
+         NAVIGATION
+    ========================================================= -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    C
+                </div>
+
+                <div>
+
+                    <div class="brand-name">
+                        CollegeConnect
+                    </div>
+
+                    <div class="brand-subtitle">
+                        TNEA College Prediction Assistant
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="nav-tabs">
+
+                <button
+                    class="nav-tab active"
+                    data-tab="predictor"
+                    type="button"
+                >
+                    Predictor
+                </button>
+
+
+                <button
+                    class="nav-tab"
+                    data-tab="optimizer"
+                    type="button"
+                >
+                    Choice Optimizer
+                </button>
+
+
+                <button
+                    class="nav-tab"
+                    data-tab="matrix"
+                    type="button"
+                >
+                    State Rank Matrix
+                </button>
+
+            </div>
+
+
+            <div class="nav-status">
+
+                <span class="status-dot"></span>
+
+                API Connected
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- =========================================================
+         MAIN
+    ========================================================= -->
+
+    <main class="container">
+
+
+        <!-- =====================================================
+             HERO
+        ====================================================== -->
+
+        <section class="hero">
+
+            <div class="hero-badge">
+                TNEA 2021–2025 Historical Data
+            </div>
+
+
+            <h1>
+
+                Tamil Nadu Engineering
+
+                <span>
+                    Admissions Intelligence
+                </span>
+
+            </h1>
+
+
+            <p>
+
+                Explore historical TNEA cutoff and rank patterns
+                to find college and branch options matching your
+                academic profile.
+
+            </p>
+
+        </section>
+
+
+        <!-- =====================================================
+             PREDICTOR TAB
+        ====================================================== -->
+
+        <section
+            id="predictorTab"
+            class="tab-content active"
+        >
+
+
+            <div class="predictor-panel">
+
+
+                <div class="section-header">
+
+                    <div>
+
+                        <div class="eyebrow">
+                            COLLEGE PREDICTOR
+                        </div>
+
+
+                        <h2>
+                            Find College &amp; Branch Options
+                        </h2>
+
+
+                        <p>
+                            Enter either your aggregate cutoff mark
+                            or TNEA state rank.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     PROFILE INPUTS
+                ================================================== -->
+
+                <div class="profile-inputs">
+
+
+                    <div class="form-group">
+
+                        <label for="cutoffMark">
+
+                            Aggregate Cutoff Mark
+
+                            <span class="optional-label">
+                                Optional
+                            </span>
+
+                        </label>
+
+
+                        <input
+                            type="number"
+                            id="cutoffMark"
+                            min="0"
+                            max="200"
+                            step="0.001"
+                            placeholder="Example: 195"
+                        >
+
+
+                        <small>
+                            TNEA cutoff mark is out of 200.
+                        </small>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="stateRank">
+
+                            TNEA State Rank
+
+                            <span class="optional-label">
+                                Optional
+                            </span>
+
+                        </label>
+
+
+                        <input
+                            type="number"
+                            id="stateRank"
+                            min="1"
+                            step="1"
+                            placeholder="Example: 5000"
+                        >
+
+
+                        <small>
+                            Enter your TNEA state rank.
+                        </small>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="community">
+
+                            Community
+
+                            <span class="required-label">
+                                Required
+                            </span>
+
+                        </label>
+
+
+                        <select id="community">
+
+                            <option value="">
+                                Select community
+                            </option>
+
+                            <option value="OC">
+                                OC
+                            </option>
+
+                            <option value="BC">
+                                BC
+                            </option>
+
+                            <option value="BCM">
+                                BCM
+                            </option>
+
+                            <option value="MBC">
+                                MBC
+                            </option>
+
+                            <option value="SC">
+                                SC
+                            </option>
+
+                            <option value="SCA">
+                                SCA
+                            </option>
+
+                            <option value="ST">
+                                ST
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- =================================================
+                     DISTRICT
+                ================================================== -->
+
+                <div class="filter-inputs">
+
+
+                    <div class="form-group">
+
+                        <label>
+
+                            Districts
+
+                            <span class="optional-label">
+                                Optional
+                            </span>
+
+                        </label>
+
+
+                        <div class="picker">
+
+
+                            <div class="picker-search-row">
+
+                                <input
+                                    id="districtSearch"
+                                    class="picker-search"
+                                    type="text"
+                                    placeholder="Search districts..."
+                                >
+
+
+                                <button
+                                    id="districtSearchButton"
+                                    class="picker-search-btn"
+                                    type="button"
+                                >
+                                    Search
+                                </button>
+
+                            </div>
+
+
+                            <div
+                                id="selectedDistricts"
+                                class="selected-chips"
+                            ></div>
+
+
+                            <div class="picker-box">
+
+                                <div
+                                    id="districtOptions"
+                                    class="picker-options"
+                                ></div>
+
+
+                                <div class="picker-footer">
+
+                                    <span
+                                        id="districtCount"
+                                        class="picker-count"
+                                    >
+                                        No districts selected
+                                    </span>
+
+
+                                    <button
+                                        id="clearDistricts"
+                                        class="picker-clear"
+                                        type="button"
+                                    >
+                                        Clear
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         BRANCH
+                    ================================================== -->
+
+                    <div class="form-group">
+
+                        <label>
+
+                            Branches / Courses
+
+                            <span class="optional-label">
+                                Optional
+                            </span>
+
+                        </label>
+
+
+                        <div class="picker">
+
+
+                            <div class="picker-search-row">
+
+                                <input
+                                    id="branchSearch"
+                                    class="picker-search"
+                                    type="text"
+                                    placeholder="Search branches / courses..."
+                                >
+
+
+                                <button
+                                    id="branchSearchButton"
+                                    class="picker-search-btn"
+                                    type="button"
+                                >
+                                    Search
+                                </button>
+
+                            </div>
+
+
+                            <div
+                                id="selectedBranches"
+                                class="selected-chips"
+                            ></div>
+
+
+                            <div class="picker-box">
+
+                                <div
+                                    id="branchOptions"
+                                    class="picker-options"
+                                ></div>
+
+
+                                <div class="picker-footer">
+
+                                    <span
+                                        id="branchCount"
+                                        class="picker-count"
+                                    >
+                                        No branches selected
+                                    </span>
+
+
+                                    <button
+                                        id="clearBranches"
+                                        class="picker-clear"
+                                        type="button"
+                                    >
+                                        Clear
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- =================================================
+                     SPECIFIC COLLEGE
+                ================================================== -->
+
+                <div class="form-group">
+
+                    <label>
+
+                        Specific College
+
+                        <span class="optional-label">
+                            Optional
+                        </span>
+
+                    </label>
+
+
+                    <div class="college-search-box">
+
+
+                        <div class="picker-search-row">
+
+                            <input
+                                id="collegeSearch"
+                                class="picker-search"
+                                type="text"
+                                placeholder="Search college..."
+                                autocomplete="off"
+                            >
+
+
+                            <button
+                                id="collegeSearchButton"
+                                class="picker-search-btn"
+                                type="button"
+                            >
+                                Search
+                            </button>
+
+                        </div>
+
+
+                        <div
+                            id="collegeSuggestions"
+                            class="college-suggestions hidden"
+                        ></div>
+
+
+                        <div
+                            id="collegeSelectedDisplay"
+                            class="college-selected-display hidden"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     INPUT HELP
+                ================================================== -->
+
+                <div class="input-help">
+
+                    Enter either
+                    <strong>Cutoff Mark</strong>
+                    or
+                    <strong>State Rank</strong>.
+
+                    Click districts and branches normally
+                    to select multiple options.
+
+                    <span>
+                        No Ctrl key is required.
+                    </span>
+
+                </div>
+
+
+                <!-- =================================================
+                     ACTIONS
+                ================================================== -->
+
+                <form
+                    id="predictionForm"
+                    class="prediction-form"
+                >
+
+                    <div class="form-actions">
+
+
+                        <button
+                            type="submit"
+                            id="findButton"
+                            class="primary-button"
+                        >
+                            Find Matching Colleges
+                        </button>
+
+
+                        <button
+                            type="button"
+                            id="clearButton"
+                            class="secondary-button"
+                        >
+                            Clear
+                        </button>
+
+
+                    </div>
+
+                </form>
+
+
+            </div>
+
+
+            <!-- =====================================================
+                 LOADING
+            ====================================================== -->
+
+            <div
+                id="loading"
+                class="loading hidden"
+            >
+                Comparing your profile with historical TNEA data...
+            </div>
+
+
+            <!-- =====================================================
+                 ERROR
+            ====================================================== -->
+
+            <div
+                id="errorMessage"
+                class="error-message hidden"
+            ></div>
+
+
+            <!-- =====================================================
+                 RESULTS
+            ====================================================== -->
+
+            <section
+                id="resultsSection"
+                class="results-section hidden"
+            >
+
+
+                <div class="results-header">
+
+                    <div>
+
+                        <div class="eyebrow">
+                            PERSONALIZED OPTIONS
+                        </div>
+
+
+                        <h2>
+                            College Options
+                        </h2>
+
+
+                        <p id="resultsSummary"></p>
+
+
+                        <div
+                            id="resultDistribution"
+                            class="result-distribution"
+                        ></div>
+
+                    </div>
+
+
+                    <div
+                        id="resultCount"
+                        class="result-count"
+                    >
+                        0 options
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     FILTER BUTTONS
+                ================================================== -->
+
+                <div class="result-filter-bar">
+
+                    <button
+                        class="result-filter-btn active"
+                        data-result-filter="ALL"
+                        type="button"
+                    >
+                        All
+                    </button>
+
+
+                    <button
+                        class="result-filter-btn"
+                        data-result-filter="Safe"
+                        type="button"
+                    >
+                        🛡 Safe
+                    </button>
+
+
+                    <button
+                        class="result-filter-btn"
+                        data-result-filter="Target"
+                        type="button"
+                    >
+                        🎯 Target
+                    </button>
+
+
+                    <button
+                        class="result-filter-btn"
+                        data-result-filter="Reach"
+                        type="button"
+                    >
+                        🔥 Reach
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="resultsList"
+                    class="result-list"
+                ></div>
+
+
+                <div class="input-help">
+
+                    Estimated probability is an
+                    <strong>indicative historical estimate</strong>.
+
+                    Safe / Target / Reach are
+                    decision-support categories,
+                    not admission guarantees.
+
+                </div>
+
+
+            </section>
+
+
+            <!-- =====================================================
+                 RAG
+            ====================================================== -->
+
+            <section
+                id="ragSection"
+                class="rag-panel hidden"
+            >
+
+
+                <div class="rag-header">
+
+                    <div class="rag-title-area">
+
+                        <div class="ai-badge">
+                            AI-ASSISTED ANALYSIS
+                        </div>
+
+
+                        <h2>
+                            Historical Analysis
+                        </h2>
+
+
+                        <p id="ragSubtitle">
+                            Gemini explanation grounded in
+                            retrieved historical TNEA evidence.
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        id="ragModelBadge"
+                        class="model-badge"
+                    >
+                        Gemini
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="ragLoading"
+                    class="rag-loading hidden"
+                >
+
+                    <div class="spinner"></div>
+
+                    Generating grounded historical analysis...
+
+                </div>
+
+
+                <div
+                    id="ragError"
+                    class="rag-error hidden"
+                ></div>
+
+
+                <div
+                    id="ragContent"
+                    class="rag-content"
+                ></div>
+
+
+                <div class="rag-disclaimer">
+
+                    AI-generated analysis is grounded in the
+                    retrieved historical TNEA data.
+                    It is not an official DoTE prediction
+                    or admission guarantee.
+
+                </div>
+
+            </section>
+
+
+            <!-- =====================================================
+                 OPEN OPTIMIZER
+            ====================================================== -->
+
+            <section class="quick-link-panel">
+
+
+                <div>
+
+                    <div class="eyebrow">
+                        BUILD YOUR PREFERENCES
+                    </div>
+
+
+                    <h3>
+                        Create your College Choice List
+                    </h3>
+
+
+                    <p>
+                        Add options from the results to your
+                        Choice Optimizer.
+                    </p>
+
+                </div>
+
+
+                <button
+                    id="openOptimizerButton"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Open Choice Optimizer
+                </button>
+
+
+            </section>
+
+
+        </section>
+
+
+        <!-- =====================================================
+             CHOICE OPTIMIZER
+        ====================================================== -->
+
+        <section
+            id="optimizerTab"
+            class="tab-content"
+        >
+
+
+            <div class="page-panel">
+
+
+                <div class="section-header">
+
+
+                    <div>
+
+                        <div class="eyebrow">
+                            CHOICE OPTIMIZER
+                        </div>
+
+
+                        <h2>
+                            Your College Preferences
+                        </h2>
+
+
+                        <p>
+                            Build and manage your proposed
+                            college–branch choice list.
+                        </p>
+
+                    </div>
+
+
+                    <div class="optimizer-actions">
+
+
+                        <button
+                            id="exportButton"
+                            class="primary-button"
+                            type="button"
+                        >
+                            Export CSV
+                        </button>
+
+
+                        <button
+                            id="clearChoicesButton"
+                            class="secondary-button"
+                            type="button"
+                        >
+                            Clear All
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="emptyChoices"
+                    class="empty-state"
+                >
+
+                    <div class="empty-icon">
+                        +
+                    </div>
+
+
+                    <h3>
+                        No choices added yet
+                    </h3>
+
+
+                    <p>
+                        Add college–branch options from
+                        the Predictor.
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="choicesContainer"
+                    class="choices-container hidden"
+                ></div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             STATE RANK MATRIX
+        ====================================================== -->
+
+        <section
+            id="matrixTab"
+            class="tab-content"
+        >
+
+
+            <div class="page-panel">
+
+
+                <div class="section-header">
+
+                    <div>
+
+                        <div class="eyebrow">
+                            STATE RANK MATRIX
+                        </div>
+
+
+                        <h2>
+                            Historical Closing Rank Matrix
+                        </h2>
+
+
+                        <p>
+                            View historical rank outcomes
+                            independently from the predictor.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="matrix-filters">
+
+
+                    <div class="form-group">
+
+                        <label for="matrixCommunity">
+                            Community
+                        </label>
+
+
+                        <select
+                            id="matrixCommunity"
+                        >
+
+                            <option value="">
+                                Select community
+                            </option>
+
+                            <option value="OC">
+                                OC
+                            </option>
+
+                            <option value="BC">
+                                BC
+                            </option>
+
+                            <option value="BCM">
+                                BCM
+                            </option>
+
+                            <option value="MBC">
+                                MBC
+                            </option>
+
+                            <option value="SC">
+                                SC
+                            </option>
+
+                            <option value="SCA">
+                                SCA
+                            </option>
+
+                            <option value="ST">
+                                ST
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="matrixDistrict">
+                            District
+                        </label>
+
+
+                        <select
+                            id="matrixDistrict"
+                        >
+
+                            <option value="">
+                                All districts
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="matrixBranch">
+                            Branch
+                        </label>
+
+
+                        <select
+                            id="matrixBranch"
+                        >
+
+                            <option value="">
+                                All branches
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="matrix-action">
+
+                        <button
+                            id="loadMatrixButton"
+                            class="primary-button"
+                            type="button"
+                        >
+                            Load Matrix
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="matrixLoading"
+                    class="loading hidden"
+                >
+                    Loading rank matrix...
+                </div>
+
+
+                <div
+                    id="matrixError"
+                    class="error-message hidden"
+                ></div>
+
+
+                <div
+                    id="matrixSection"
+                    class="table-wrapper hidden"
+                >
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Position
+                                </th>
+
+                                <th>
+                                    College
+                                </th>
+
+                                <th>
+                                    Branch
+                                </th>
+
+                                <th>
+                                    District
+                                </th>
+
+                                <th>
+                                    Year
+                                </th>
+
+                                <th>
+                                    Cutoff
+                                </th>
+
+                                <th>
+                                    Closing Rank
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody
+                            id="matrixTableBody"
+                        ></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             INFORMATION
+        ====================================================== -->
+
+        <section class="info-panel">
+
+
+            <div class="info-icon">
+                i
+            </div>
+
+
+            <div>
+
+                <h3>
+                    About CollegeConnect
+                </h3>
+
+
+                <p>
+                    CollegeConnect compares student input
+                    against historical TNEA admission records
+                    from 2021–2025.
+                </p>
+
+
+                <p>
+                    Results show an indicative historical
+                    probability estimate and a Safe, Target,
+                    or Reach classification.
+                </p>
+
+
+                <p>
+                    These outputs are intended for
+                    decision support and do not guarantee
+                    admission.
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <script src="/assets/app.js"></script>
+
+</body>
+
+</html>
